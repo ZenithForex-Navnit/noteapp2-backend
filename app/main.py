@@ -14,20 +14,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://your-frontend-domain.com"  # agar deploy frontend bhi
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # testing ke liye ["*"] bhi kar sakte ho
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -47,7 +33,7 @@ ALGORITHM = "HS256"
 # --- CORS Configuration ---
 origins = [
     "http://localhost:3000",  # Allow your Next.js frontend
-    "http://127.0.0.1:3000",
+    "https://noteapp-backend-8vrm.onrender.com",
 ]
 
 app.add_middleware(
