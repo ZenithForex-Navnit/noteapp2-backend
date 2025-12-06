@@ -232,6 +232,7 @@ def read_notes(current_user: models.User = Depends(get_current_user), db: Sessio
               .filter(models.Note.owner_id == current_user.id)\
               .options(joinedload(models.Note.owner))\
               .all()
+    print("DEBUG NOTES =>", notes)
     return notes
 
 
