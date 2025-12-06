@@ -10,7 +10,6 @@ from jose import jwt, JWTError
 from typing import Optional
 from sqlalchemy.orm import joinedload
 from . import models, database , schemas
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
