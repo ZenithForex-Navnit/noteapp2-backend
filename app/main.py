@@ -32,6 +32,7 @@ ALGORITHM = "HS256"
 # --- CORS Configuration ---
 origins = [
     "https://noteapp2-frontend.onrender.com",  # Allow your Next.js frontend
+    "http://localhost:3000",  # Allow your Next.js frontend
     "https://noteapp-backend-8vrm.onrender.com",
 ]
 
