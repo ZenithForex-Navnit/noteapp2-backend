@@ -10,6 +10,7 @@ from jose import jwt, JWTError
 from typing import Optional
 from pydantic import BaseModel
 from sqlalchemy.orm import joinedload
+from . import models, database , schemas
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
@@ -19,7 +20,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="signin")
 
 
 # Assuming .models and .database are in the same folder
-from . import models, database , schemas
 
 # Create tables if they don't exist
 # This is typically done during application startup or via a migration tool
