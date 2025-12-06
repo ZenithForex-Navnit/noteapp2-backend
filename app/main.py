@@ -10,6 +10,23 @@ from jose import jwt, JWTError
 from typing import Optional
 from sqlalchemy.orm import joinedload
 from . import models, database , schemas
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://your-frontend-domain.com"  # agar deploy frontend bhi
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # testing ke liye ["*"] bhi kar sakte ho
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class NoteUpdate(BaseModel):
     title: Optional[str] = None
@@ -24,13 +41,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="signin")
 # This is typically done during application startup or via a migration tool
 models.Base.metadata.create_all(bind=database.engine)
 
-app = FastAPI()
-
 SECRET_KEY = "SUPER_SECRET_KEY"
 ALGORITHM = "HS256"
-
-# ...
-app = FastAPI()
 
 # --- CORS Configuration ---
 origins = [
