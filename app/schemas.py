@@ -12,3 +12,13 @@ class NoteResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class Note(BaseModel):
+    id: int
+    title: str
+    description: str
+    owner_id: int
+
+    class Config:
+        orm_mode = True
+
