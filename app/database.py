@@ -8,9 +8,7 @@ import os
 # Replace with 'postgresql://user:password@host:port/dbname' for PostgreSQL
 DATABASE_URL = "postgresql://notes_db_nhyc_user:tR3hRK0s12GitIk86RAMoB7oGTqfmnAg@dpg-d4q27gshg0os738117j0-a.virginia-postgres.render.com/notes_db_nhyc"
 
-engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False} # Needed for SQLite
-)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
