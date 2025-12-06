@@ -49,16 +49,12 @@ def read_root():
 # --- End CORS Configuration ---
 
 # --- Schemas (Pydantic models for request/response) ---
-from pydantic import BaseModel
-from typing import Optional
-
-# --- User schemas ---
 class UserCreate(BaseModel):
     name: str
     email: str
     password: str
-    role: str = "user"
-    secretpass: Optional[str] = None
+    role: str = "user"  # default
+    secretpass: Optional[str] = None  # optional for frontend check
 
 class UserInDB(BaseModel):
     id: int
@@ -68,8 +64,15 @@ class UserInDB(BaseModel):
 
     class Config:
         orm_mode = True
+class Note(BaseModel):
+    id: int
+    title: str
+    description: str
+    owner_id: int
 
-# --- Note schemas ---
+    class Config:
+        orm_mode = True
+
 class NoteBase(BaseModel):
     title: str
     description: str
@@ -77,22 +80,9 @@ class NoteBase(BaseModel):
 class NoteCreate(NoteBase):
     pass
 
-# Nested owner info for response
-class OwnerInfo(BaseModel):
+class Note(NoteBase):
     id: int
-    name: str
-    email: str
-    role: str
-
-    class Config:
-        orm_mode = True
-
-class NoteResponse(BaseModel):
-    id: int
-    title: str
-    description: str
-    owner: OwnerInfo  # nested user info
-
+    owner_id: int
     class Config:
         orm_mode = True
 def create_token(data: dict):
@@ -228,33 +218,21 @@ def sign_in(email: str, password: str, db: Session = Depends(database.get_db)):
 # --- Notes CRUD Endpoints ---
 
 # READ ALL NOTES (Dashboard/List) - Role-Based Access Control
-# @app.get("/notes", response_model=List[schemas.NoteResponse])
-# def read_notes(current_user: models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
-
-#     if current_user.role == "admin":
-#         # Admin: all notes with owner info
-#         notes = db.query(models.Note).options(joinedload(models.Note.owner)).all()
-#         return notes
-
-#     # User: only their notes with owner info
-#     notes = db.query(models.Note)\
-#               .filter(models.Note.owner_id == current_user.id)\
-#               .options(joinedload(models.Note.owner))\
-#               .all()
-#     print("DEBUG NOTES =>", notes)
-#     return notes
-@app.get("/notes", response_model=List[NoteResponse])
+@app.get("/notes", response_model=List[schemas.NoteResponse])
 def read_notes(current_user: models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
 
     if current_user.role == "admin":
+        # Admin: all notes with owner info
         notes = db.query(models.Note).options(joinedload(models.Note.owner)).all()
-    else:
-        notes = db.query(models.Note)\
-                  .filter(models.Note.owner_id == current_user.id)\
-                  .options(joinedload(models.Note.owner))\
-                  .all()
+        return notes
 
-    return notes  # OR jsonable_encoder(notes) for safety
+    # User: only their notes with owner info
+    notes = db.query(models.Note)\
+              .filter(models.Note.owner_id == current_user.id)\
+              .options(joinedload(models.Note.owner))\
+              .all()
+    print("DEBUG NOTES =>", notes)
+    return notes
 
 
 # CREATE NOTE
