@@ -218,21 +218,48 @@ def sign_in(email: str, password: str, db: Session = Depends(database.get_db)):
 # --- Notes CRUD Endpoints ---
 
 # READ ALL NOTES (Dashboard/List) - Role-Based Access Control
+# @app.get("/notes", response_model=List[schemas.NoteResponse])
+# def read_notes(current_user: models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
+
+#     if current_user.role == "admin":
+#         # Admin: all notes with owner info
+#         notes = db.query(models.Note).options(joinedload(models.Note.owner)).all()
+#         return notes
+
+#     # User: only their notes with owner info
+#     notes = db.query(models.Note)\
+#               .filter(models.Note.owner_id == current_user.id)\
+#               .options(joinedload(models.Note.owner))\
+#               .all()
+#     print("DEBUG NOTES =>", notes)
+#     return notes
+
 @app.get("/notes", response_model=List[schemas.NoteResponse])
 def read_notes(current_user: models.User = Depends(get_current_user), db: Session = Depends(database.get_db)):
 
     if current_user.role == "admin":
         # Admin: all notes with owner info
         notes = db.query(models.Note).options(joinedload(models.Note.owner)).all()
-        return notes
-
-    # User: only their notes with owner info
-    notes = db.query(models.Note)\
-              .filter(models.Note.owner_id == current_user.id)\
-              .options(joinedload(models.Note.owner))\
-              .all()
-    print("DEBUG NOTES =>", notes)
-    return notes
+    else:
+        # User: only their notes with owner info
+        notes = db.query(models.Note)\
+                  .filter(models.Note.owner_id == current_user.id)\
+                  .options(joinedload(models.Note.owner))\
+                  .all()
+    
+    # Transform ORM objects to response schema
+    return [
+        schemas.NoteResponse(
+            id=note.id,
+            title=note.title,
+            description=note.description,
+            owner=schemas.OwnerInfo(
+                name=note.owner.name,
+                email=note.owner.email
+            ) if note.owner else None
+        )
+        for note in notes
+    ]
 
 
 # CREATE NOTE
