@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class OwnerInfo(BaseModel):
@@ -8,7 +9,7 @@ class NoteResponse(BaseModel):
     id: int
     title: str
     description: str
-    owner: OwnerInfo
+    owner: Optional[OwnerInfo] = None
 
     class Config:
         orm_mode = True
